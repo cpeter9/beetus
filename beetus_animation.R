@@ -8,11 +8,11 @@ library(zoo)
 # install.packages("ggplot2")
 library(ggplot2)
 
-beetus.df <- read.csv("C:/R_stuff/gentrys_beetus_folder/gentrys_beetus_folder/data/gentry_09102012.csv",
+beetus.df <- read.csv("C:/R_stuff/gentrys_beetus_folder/gentrys_beetus_folder/data/gentry_03012013.csv",
                       skip = 11, header = TRUE, stringsAsFactors = FALSE)
 
-beetus.df$Date <- as.Date(beetus.df$Date, format = "%d/%m/%y")
-    beetus.df$Date <- as.Date(paste("2012", substr(beetus.df$Date, 6, 10), sep = "-"))
+beetus.df$Date <- as.Date(beetus.df$Date, format = "%m/%d/%Y")
+# beetus.df$Date <- as.Date(paste("2012", substr(beetus.df$Date, 6, 10), sep = "-"))
 
 beetus.df$Timestamp <- paste(beetus.df$Date, beetus.df$Time, sep = " ")
 
@@ -67,27 +67,46 @@ beetus.df$Date <- as.Date(beetus.df$Date)
 # install.packages("animation")
   library(animation)
 
+# install.packages("ggthemes")
+  library(ggthemes)
+
+# beetus.df <- beetus.df[beetus.df$Date > ""]
+
 saveMovie({
   for(i in beetus.df[!duplicated(beetus.df$Date), "Date"][-c(1:3)]){
-    end <- as.Date(i)  
-    print(ggplot(beetus.df[beetus.df$Date >= (end - 3) & beetus.df$Date < end, ], aes(x = Time, y = bg)) +
-            geom_smooth() +
+    end <- as.Date(i) 
+    days_included <- 7
+    print(ggplot(beetus.df[beetus.df$Date >= (end - days_included) & beetus.df$Date < end, ], aes(x = Time, y = bg)) +
+            geom_smooth(linetype = 0) +
+            geom_hline(yintercept = 70, colour = "red", size = 1) +
+            geom_hline(yintercept = 150, colour = "red", size = 1) +
             geom_point() +
-            ggtitle(end) +
-            scale_y_continuous(limits = c(60, 250)) +
-            scale_x_continuous(limits = c(0, 23))
+            ylab("Blood Glucose") +
+            xlab(paste("Seven days ending:", format(end, "%B %d, %Y"))) +
+            scale_y_continuous(limits = c(60, 250), breaks = seq(0, 250, 25)) +
+            scale_x_continuous(limits = c(0, 23), breaks = seq(0, 24, 2)) +
+            theme_few() +
+            theme(axis.title = element_text(size = 16),
+                  axis.text = element_text(size = 20)))
     )
   }
 }, interval = 0.75, movie.name = "test.gif", ani.width = 600, ani.height = 600)
 
 
-end <- as.Date("2012-08-05")
-ggplot(beetus.df[beetus.df$Date >= (end - 3) & beetus.df$Date < end, ], aes(x = Time, y = bg)) +
-  geom_smooth() +
+end <- as.Date("2013-02-12")
+days_included <- 7
+ggplot(beetus.df[beetus.df$Date >= (end - days_included) & beetus.df$Date < end, ], aes(x = Time, y = bg)) +
+  geom_smooth(linetype = 0) +
+  geom_hline(yintercept = 70, colour = "red", size = 1) +
+  geom_hline(yintercept = 150, colour = "red", size = 1) +
   geom_point() +
-  ggtitle(end) +
-  scale_y_continuous(limits = c(60, 250)) +
-  scale_x_continuous(limits = c(0, 23))
+  ylab("Blood Glucose") +
+  xlab(paste("Seven days ending:", format(end, "%B %d, %Y"))) +
+  scale_y_continuous(limits = c(60, 250), breaks = seq(0, 250, 25)) +
+  scale_x_continuous(limits = c(0, 23), breaks = seq(0, 24, 2)) +
+  theme_few() +
+  theme(axis.title = element_text(size = 16),
+        axis.text = element_text(size = 20))
 
 
 
